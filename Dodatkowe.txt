@@ -1,0 +1,37 @@
+import roboticstoolbox as rtb
+import numpy as np
+from spatialmath import *
+from spatialmath.base import *
+from spatialmath.base.symbolic import *
+from roboticstoolbox.tools.trajectory import *
+import matplotlib.pyplot as plt
+
+robot = rtb.models.Panda()
+
+xCenter = 0.65
+yCenter = 0.2
+zValue = 0.15
+
+circlePointsCount = 64
+circleRadius = 0.1
+
+xPos =[]
+yPos =[]
+
+angleStep = 2 * np.pi / (circlePointsCount - 1)
+ikine = [robot.qz]
+for i in range(circlePointsCount):
+    xPos.append(xCenter + circleRadius * cos(i * angleStep))
+    yPos.append(yCenter + circleRadius * sin(i * angleStep))
+
+    ikine.append(robot.ikine_LM(SE3(xPos[i], yPos[i], zValue) * SE3.Rx(-np.pi)).q)
+
+plt.plot(xPos, yPos)
+
+traj = mstraj(np.array(ikine), dt = 1.0, tacc = 0.2, qdmax = 0.2)
+rtb.qplot(traj.q)
+
+robot.plot(traj.q, backend='pyplot', movie='panda_pyplot.gif')
+
+Napisz na #nauka
+pdf L3_z3_nrcw
